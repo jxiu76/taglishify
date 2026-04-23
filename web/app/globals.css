@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 body {
-  @apply bg-background text-gray-100 min-h-screen;
+  @apply bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-gray-100 min-h-screen transition-colors duration-300;
 }
 
 /* Reusable Glassmorphism Utility */
 .glass-panel {
-  @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl transition-all duration-300;
+  @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 shadow-xl transition-all duration-300;
 }

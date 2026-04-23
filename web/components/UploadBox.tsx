@@ -44,17 +44,17 @@ export default function UploadBox({ onUploadSuccess }: { onUploadSuccess: (data:
 
   return (
     <motion.div 
-      className={`glass-panel border-2 border-dashed flex flex-col items-center justify-center p-12 transition-colors ${isHover ? 'border-blue-400 bg-white/10' : 'border-white/20'}`}
+      className={`glass-panel border-4 border-dashed flex flex-col items-center justify-center py-20 px-8 transition-colors ${isHover ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-slate-700' : 'border-blue-200 bg-blue-50/50 dark:border-slate-600 dark:bg-slate-700/50'}`}
       onDragEnter={() => setIsHover(true)}
       onDragLeave={() => setIsHover(false)}
       whileHover={{ scale: 1.02 }}
     >
-      <UploadCloud className="w-16 h-16 text-blue-400 mb-4" />
-      <h2 className="text-2xl font-bold mb-2">Drag & Drop Video Here</h2>
-      <p className="text-gray-400 mb-6 max-w-sm text-center">Supports MP4, MKV up to 2GB. Whisper Large V3 Turbo handles the heavy lifting locally.</p>
+      <UploadCloud className="w-20 h-20 text-blue-600 dark:text-blue-400 mb-4" />
+      <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">Upload your video here.</h2>
+      <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md text-center">Supports MP4, MKV up to 2GB. Whisper Large V3 Turbo handles the heavy lifting locally.</p>
       
-      <label className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full cursor-pointer transition-colors shadow-lg shadow-blue-500/20">
-        {loading ? "Processing via Next.js + FastAPI..." : "Select Local Video"}
+      <label className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-xl font-semibold px-10 py-5 rounded-lg cursor-pointer transition-colors shadow-lg">
+        {loading ? "Transcribing..." : "Select Video"}
         <input type="file" className="hidden" accept="video/mp4,video/x-m4v,video/*" onChange={handleFileChange} />
       </label>
     </motion.div>

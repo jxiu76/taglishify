@@ -26,11 +26,35 @@ def run_transcription(audio_path: str):
         condition_on_previous_text=False
     )
     
-    # We will accumulate the raw text for the refiner LLM
+    # We will accumulate the raw text
     text_buffer = []
     
+    def refine_segment(text: str) -> str:
+        text = text.strip()
+        if len(text) <= 42:
+            return text
+        # Find the space or comma closest to the middle
+        mid = len(text) // 2
+        import re
+        split_idx = -1
+        min_dist = len(text)
+        for match in re.finditer(r'[ ,]', text):
+            dist = abs(match.start() - mid)
+            if dist < min_dist:
+                min_dist = dist
+                split_idx = match.start()
+                
+        if split_idx != -1:
+            if text[split_idx] == ',':
+                return text[:split_idx + 1] + "\n" + text[split_idx + 1:].lstrip()
+            else:
+                return text[:split_idx] + "\n" + text[split_idx + 1:].lstrip()
+        return text
+    
     for segment in segments:
-        segment_text = f"[{segment.start:.2f}s - {segment.end:.2f}s]: {segment.text}"
+        refined_text = refine_segment(segment.text)
+        # Assuming the UI expects the format with timestamp line and the text
+        segment_text = f"[{segment.start:.2f}s - {segment.end:.2f}s]: {refined_text}"
         print(f"  > {segment_text}", flush=True) # Immediate terminal feedback
         text_buffer.append(segment_text)
         
