@@ -17,12 +17,21 @@ def run_transcription(audio_path: str):
     """
     Runs the faster-whisper local engine and returns the text chunks.
     """
-    segments, info = model.transcribe(audio_path, beam_size=5)
+    # vad_filter stops hallucinations in silence periods.
+    # condition_on_previous_text=False prevents repetitive "sticky" loops.
+    segments, info = model.transcribe(
+        audio_path, 
+        beam_size=5, 
+        vad_filter=True,
+        condition_on_previous_text=False
+    )
     
     # We will accumulate the raw text for the refiner LLM
     text_buffer = []
     
     for segment in segments:
-        text_buffer.append(f"[{segment.start:.2f}s - {segment.end:.2f}s]: {segment.text}")
+        segment_text = f"[{segment.start:.2f}s - {segment.end:.2f}s]: {segment.text}"
+        print(f"  > {segment_text}", flush=True) # Immediate terminal feedback
+        text_buffer.append(segment_text)
         
-    return "\n".join(text_buffer)
+    return text_buffer

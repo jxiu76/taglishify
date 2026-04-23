@@ -4,5 +4,8 @@ python-multipart
 faster-whisper
 ffmpeg-python
 psutil
-google-generativeai
+google-genai
 pydantic
+transformers
+torch
+accelerate

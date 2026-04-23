@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { Download } from 'lucide-react';
 
 export default function Editor({ rawAsr, initialRefined }: { rawAsr: string, initialRefined: string }) {
-  const [text, setText] = useState(initialRefined);
+  const [text, setText] = useState(initialRefined || "");
 
   // Check 42 Char Limits dynamically
-  const lines = text.split('\n');
+  const lines = (text || "").split('\n');
   const hasErrors = lines.some(line => line.length > 42);
 
   const exportText = () => {
@@ -28,23 +28,18 @@ export default function Editor({ rawAsr, initialRefined }: { rawAsr: string, ini
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 h-full min-h-0">
-        {/* Raw ASR pane */}
-        <div className="flex flex-col min-h-0 bg-black/40 rounded-xl border border-white/5 p-4 overflow-auto">
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">Raw Whisper Large V3 Output</div>
-          <p className="text-gray-400 font-mono text-sm leading-relaxed whitespace-pre-wrap">{rawAsr}</p>
-        </div>
-        
-        {/* Editor Pane */}
-        <div className={`flex flex-col min-h-0 bg-black/40 rounded-xl border p-4 relative ${hasErrors ? 'border-red-500/50' : 'border-white/5'}`}>
-          <div className="flex justify-between items-center mb-2">
-             <div className="text-xs text-blue-400 uppercase tracking-wider font-semibold">Gemini Flash Refined Taglish (Edit Mode)</div>
+      <div className="flex flex-col h-full min-h-0">
+        {/* Unified Editor Pane */}
+        <div className={`flex flex-col min-h-0 bg-black/40 rounded-xl border p-6 relative ${hasErrors ? 'border-red-500/50' : 'border-white/5'}`}>
+          <div className="flex justify-between items-center mb-4">
+             <div className="text-xs text-blue-400 uppercase tracking-wider font-semibold">Subtitles Editor (Taglishified)</div>
              {hasErrors && <span className="text-xs text-red-500 font-bold animate-pulse">⚠️ Over 42 Chars Found</span>}
           </div>
           <textarea 
-            className={`w-full h-full bg-transparent resize-none focus:outline-none text-sm font-mono leading-relaxed ${hasErrors ? 'text-red-300' : 'text-gray-200'}`}
+            className={`w-full h-full bg-transparent resize-none focus:outline-none text-base font-mono leading-relaxed ${hasErrors ? 'text-red-300' : 'text-gray-100'}`}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            spellCheck={false}
           />
         </div>
       </div>

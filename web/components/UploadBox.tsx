@@ -31,10 +31,12 @@ export default function UploadBox({ onUploadSuccess }: { onUploadSuccess: (data:
         body: processForm
       });
       let processData = await processRes.json();
+      if (!processRes.ok) {
+         throw new Error(processData.detail || "Processing Failed on Backend");
+      }
       onUploadSuccess(processData);
-    } catch (e) {
-      console.error(e);
-      alert("Upload or API Processing Failed");
+    } catch (e: any) {
+      alert(`Backend Execution Error: ${e.message}`);
     } finally {
       setLoading(false);
     }

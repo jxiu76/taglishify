@@ -65,26 +65,44 @@ async def process_video(filename: str = Form(...)):
     
     try:
         # Step 1: Extract Audio
-        print(f"Extracting Audio for {filename}...")
+        print(f"\n--- [1/3] Extracting Audio: {filename} ---", flush=True)
         extract_audio(video_path, audio_path)
+        print("    OK: Audio extracted to temp storage.", flush=True)
         
         # Step 2: Transcribe
-        print("Running faster-whisper local ASR...")
-        raw_text = run_transcription(audio_path)
+        print("--- [2/3] Running faster-whisper (local machine) ---", flush=True)
+        raw_segments = run_transcription(audio_path)
+        print(f"    OK: Transcribed {len(raw_segments)} segments.", flush=True)
         
         # Step 3: Refine
-        if not raw_text.strip():
+        if not raw_segments:
+            print("    ERROR: No speech detected in audio.", flush=True)
             return {"status": "failed", "error": "Transcription returned empty."}
             
-        print("Refining through Gemini 1.5 Flash...")
-        refined_taglish_subtitles = refine_transcription(raw_text)
+        print("--- [3/3] Refining via Local LLM (Qwen 1.5B) ---", flush=True)
+        refined_taglish_subtitles = refine_transcription(raw_segments)
+        
+        # Fallback if Gemini fails
+        raw_text_joined = "\n".join(raw_segments)
+        final_subtitles = refined_taglish_subtitles if refined_taglish_subtitles else raw_text_joined
+        
+        if not refined_taglish_subtitles:
+             print("    WARNING: Local Refiner failed. Falling back to Raw Whisper text.", flush=True)
+        else:
+             print("    OK: Refinement complete.", flush=True)
+        
+        print("\n--- PROCESS COMPLETE ---\n", flush=True)
         
         return {
             "status": "success",
-            "raw_asr": raw_text,
-            "refined_subtitles": refined_taglish_subtitles
+            "raw_asr": raw_text_joined,
+            "refined_subtitles": final_subtitles
         }
     except Exception as e:
+        import traceback
+        print("\n=== ERROR TRACEBACK ===")
+        print(traceback.format_exc())
+        print("=======================\n")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if os.path.exists(audio_path):
